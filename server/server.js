@@ -15,13 +15,22 @@ io.on('connection', (socket)=>{
     console.log('New user is connected');
 
     socket.emit('newMessage', {
-        from: 'From server side Message',
-        text: 'Hey',
-        createdAt: 3243244
+       from: 'Admin',
+       text: 'Welcome to New User'
+    });
+
+    socket.broadcast.emit('newMessage', {
+       from: 'Admin',
+       text: 'New user has joined'
     });
 
     socket.on('createMessage', (msg) =>{
         console.log('createMessage:', msg);
+        socket.broadcast.emit('newMessage', {
+            from: msg.from,
+            text: msg.text,
+            createdAt: new Date().getTime()
+        });
     });
 
     socket.on('disconnect', () => {
