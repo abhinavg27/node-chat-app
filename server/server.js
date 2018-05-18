@@ -3,6 +3,7 @@ const path = require('path');
 const http = require('http');
 const socketID = require('socket.io');
 const app = express();
+const {generateMessage} = require('./utils/message');
 var server = http.createServer(app);
 var io = socketID(server);
 
@@ -14,23 +15,13 @@ app.use(express.static(publicFolder));
 io.on('connection', (socket)=>{
     console.log('New user is connected');
 
-    socket.emit('newMessage', {
-       from: 'Admin',
-       text: 'Welcome to New User'
-    });
+    socket.emit('newMessage', generateMessage('Admin','Welcome to New User!'));
 
-    socket.broadcast.emit('newMessage', {
-       from: 'Admin',
-       text: 'New user has joined'
-    });
+    socket.broadcast.emit('newMessage', generateMessage('Admin','New User has Joined!'));
 
     socket.on('createMessage', (msg) =>{
         console.log('createMessage:', msg);
-        socket.broadcast.emit('newMessage', {
-            from: msg.from,
-            text: msg.text,
-            createdAt: new Date().getTime()
-        });
+        io.emit('newMessage', generateMessage(msg.from,msg.text));
     });
 
     socket.on('disconnect', () => {
